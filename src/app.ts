@@ -1,3 +1,22 @@
+// autobind decorator
+function autobind(
+  //미사용 변수 경고 없애기위해서 _, _순번 규칙을 따르거나 tsconfig.js에서 noUnusedParameters=false로 변경하면됨
+  _: any, // target
+  _2: string, // methodName
+  descriptor: PropertyDescriptor
+) {
+  const originalMethod = descriptor.value;
+  const adjDescriptor: PropertyDescriptor = {
+    configurable: true,
+    get() {
+      const boundFn = originalMethod.bind(this);
+      return boundFn;
+    },
+  };
+  return adjDescriptor;
+}
+
+// ProjectInput Class
 class ProjectInput {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
@@ -33,6 +52,7 @@ class ProjectInput {
     this.attach();
   }
 
+  @autobind
   private submitHandler(event: Event) {
     event.preventDefault();
     console.log("title", this.titleInputElement.value);
@@ -41,7 +61,7 @@ class ProjectInput {
   }
 
   private configure() {
-    this.element.addEventListener("submit", this.submitHandler.bind(this));
+    this.element.addEventListener("submit", this.submitHandler);
   }
 
   private attach() {
